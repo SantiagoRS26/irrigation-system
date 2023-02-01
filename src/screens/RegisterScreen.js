@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { Text } from 'react-native-paper'
 import Background from '../components/Background'
@@ -11,8 +11,23 @@ import { theme } from '../core/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
 import { nameValidator } from '../helpers/nameValidator'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, getAuth, initializeAuth } from 'firebase/auth'
+import { initializeApp } from 'firebase/app';
+import { firebaseConfig } from '../helpers/firebaseConfig'
 
 export default function RegisterScreen({ navigation }) {
+
+  const auth = getAuth();
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if(user){
+        navigation.navigate("Dashboard")
+      }
+    })
+    return unsubscribe
+  })
+
   const [name, setName] = useState({ value: '', error: '' })
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
@@ -27,10 +42,21 @@ export default function RegisterScreen({ navigation }) {
       setPassword({ ...password, error: passwordError })
       return
     }
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Dashboard' }],
-    })
+    createUserWithEmailAndPassword(auth ,email.value, password.value)
+      .then((userCredencial) => {
+        console.log('Usuario Creado!');
+        const user = userCredencial.user;
+        console.log(user);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Dashboard' }],
+        })
+      })
+      .catch(error => {
+        console.log(email.value)
+        console.log(password.value)
+        console.log(error)
+      })
   }
 
   return (

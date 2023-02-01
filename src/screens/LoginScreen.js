@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TouchableOpacity, StyleSheet, View } from 'react-native'
 import { Text } from 'react-native-paper'
 import Background from '../components/Background'
@@ -10,8 +10,22 @@ import BackButton from '../components/BackButton'
 import { theme } from '../core/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
+import {getAuth } from 'firebase/auth'
+import { firebaseConfig } from '../helpers/firebaseConfig'
 
 export default function LoginScreen({ navigation }) {
+
+  const auth = getAuth();
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(user => {
+      if(user){
+        navigation.navigate("Dashboard")
+      }
+    })
+    return unsubscribe
+  })
+
   const [email, setEmail] = useState({ value: '', error: '' })
   const [password, setPassword] = useState({ value: '', error: '' })
 
@@ -23,10 +37,19 @@ export default function LoginScreen({ navigation }) {
       setPassword({ ...password, error: passwordError })
       return
     }
-    navigation.reset({
-      index: 0,
-      routes: [{ name: 'Dashboard' }],
-    })
+    signInWithEmailAndPassword(auth ,email.value, password.value)
+      .then((userCredencial) => {
+        console.log('Sesion iniciada!');
+        const user = userCredencial.user;
+        console.log(user);
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Dashboard' }],
+        })
+      })
+      .catch(error => {
+        console.log(error)
+      })
   }
 
   return (

@@ -1,4 +1,6 @@
-export const  firebaseConfig = {
+import { initializeApp } from "firebase/app";
+
+const  firebaseConfig = {
     apiKey: "AIzaSyBOSaiFzZ6Z44HuZsszGjcz8i2rTldoG3s",
     authDomain: "sistema-de-irrigacion.firebaseapp.com",
     databaseURL: "https://sistema-de-irrigacion-default-rtdb.firebaseio.com",
@@ -9,3 +11,7 @@ export const  firebaseConfig = {
     measurementId: "G-NQKZD3YXGL",
     databaseURL: "https://sistema-de-irrigacion-default-rtdb.firebaseio.com/"
   };
+
+const app = initializeApp(firebaseConfig);
+
+export default app;
