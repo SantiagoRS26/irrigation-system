@@ -10,7 +10,7 @@ import BackButton from '../components/BackButton'
 import { theme } from '../core/theme'
 import { emailValidator } from '../helpers/emailValidator'
 import { passwordValidator } from '../helpers/passwordValidator'
-import {getAuth } from 'firebase/auth'
+import {getAuth, signInWithEmailAndPassword} from 'firebase/auth'
 import { firebaseConfig } from '../helpers/firebaseConfig'
 
 export default function LoginScreen({ navigation }) {
@@ -48,6 +48,13 @@ export default function LoginScreen({ navigation }) {
         })
       })
       .catch(error => {
+        if(error.code === 'auth/wrong-password'){ 
+          setPassword({ ...password, error: "Contraseña Incorrecta!" })
+          return
+      }
+      if(error.code === 'auth/too-many-requests'){
+        setPassword({ ...password, error: "El acceso a esta cuenta se ha inhabilitado temporalmente debido a muchos intentos fallidos de inicio de sesión." });
+      }
         console.log(error)
       })
   }
